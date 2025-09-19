@@ -6,6 +6,7 @@ import { getCartFromStorage, getCartItemCount } from '../utils/cart';
 const Header: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
 
   useEffect(() => {
@@ -22,6 +23,15 @@ const Header: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   const navigationItems = [
     { name: 'Home', path: '/' },
     { name: 'Shop', path: '/shop' },
@@ -34,17 +44,19 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className="bg-white shadow-lg sticky top-0 z-50">
+    <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${
+      scrolled ? 'glass shadow-2xl' : 'bg-transparent'
+    }`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="bg-gradient-to-r from-green-800 to-green-600 p-2 rounded-full">
-              <Leaf className="h-6 w-6 text-white" />
+          <Link to="/" className="flex items-center space-x-3 group">
+            <div className="bg-gradient-to-r from-electric-mint to-electric-orange p-2 rounded-full glow-mint group-hover:scale-110 transition-transform duration-300">
+              <Leaf className="h-6 w-6 text-forest-green" />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-green-800">Vedham Eldix</h1>
-              <p className="text-xs text-green-600 hidden sm:block">Nutrition Rooted in Tradition</p>
+              <h1 className="text-xl font-bold gradient-text">Vedham Eldix</h1>
+              <p className="text-xs text-electric-mint hidden sm:block">Nutrition Rooted in Tradition</p>
             </div>
           </Link>
 
@@ -54,13 +66,16 @@ const Header: React.FC = () => {
               <Link
                 key={item.name}
                 to={item.path}
-                className={`px-3 py-2 rounded-md text-sm font-medium transition-colors duration-200 ${
+                className={`relative px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300 group ${
                   isActivePath(item.path)
-                    ? 'text-green-800 bg-green-50 border-b-2 border-green-800'
-                    : 'text-gray-700 hover:text-green-800 hover:bg-green-50'
+                    ? 'text-electric-mint glass'
+                    : 'text-gray-200 hover:text-electric-mint hover:glass'
                 }`}
               >
                 {item.name}
+                <span className={`absolute bottom-0 left-0 w-full h-0.5 bg-gradient-to-r from-electric-orange to-electric-mint transform origin-left transition-transform duration-300 ${
+                  isActivePath(item.path) ? 'scale-x-100' : 'scale-x-0 group-hover:scale-x-100'
+                }`} />
               </Link>
             ))}
           </nav>
@@ -69,11 +84,11 @@ const Header: React.FC = () => {
           <div className="flex items-center space-x-4">
             <Link
               to="/cart"
-              className="relative p-2 text-gray-700 hover:text-green-800 transition-colors duration-200"
+              className="relative p-3 text-gray-200 hover:text-electric-mint transition-colors duration-300 glass rounded-full hover:glow-mint"
             >
               <ShoppingCart className="h-6 w-6" />
               {cartItemCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 bg-gradient-to-r from-electric-orange to-vibrant-coral text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-bold pulse-glow">
                   {cartItemCount}
                 </span>
               )}
@@ -82,7 +97,7 @@ const Header: React.FC = () => {
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden p-2 text-gray-700 hover:text-green-800 transition-colors duration-200"
+              className="md:hidden p-3 text-gray-200 hover:text-electric-mint transition-colors duration-300 glass rounded-full"
             >
               {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
@@ -91,17 +106,17 @@ const Header: React.FC = () => {
 
         {/* Mobile Navigation */}
         {isMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div className="md:hidden py-4 glass rounded-xl mt-2 border border-electric-mint/20">
             <div className="space-y-2">
               {navigationItems.map((item) => (
                 <Link
                   key={item.name}
                   to={item.path}
                   onClick={() => setIsMenuOpen(false)}
-                  className={`block px-3 py-2 rounded-md text-base font-medium transition-colors duration-200 ${
+                  className={`block px-4 py-3 rounded-lg text-base font-medium transition-all duration-300 ${
                     isActivePath(item.path)
-                      ? 'text-green-800 bg-green-50'
-                      : 'text-gray-700 hover:text-green-800 hover:bg-green-50'
+                      ? 'text-electric-mint bg-electric-mint/10'
+                      : 'text-gray-200 hover:text-electric-mint hover:bg-electric-mint/5'
                   }`}
                 >
                   {item.name}
